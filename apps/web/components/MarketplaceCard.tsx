@@ -32,12 +32,6 @@ export function MarketplaceCard({
     unavailable: "bg-red-100 text-red-800",
   };
 
-  const statusLabels = {
-    fundable: "Fundable",
-    "capacity-limited": "Capacity Limited",
-    unavailable: "Unavailable",
-  };
-
   const handleFund = async () => {
     if (!onFund) return;
     try {
@@ -52,22 +46,25 @@ export function MarketplaceCard({
   };
 
   return (
-    <div className="border rounded-lg p-4 shadow-sm flex flex-col gap-2">
-      <div className="flex justify-between items-center">
-        <span className="font-semibold">Invoice #{id}</span>
-        <span className={`px-2 py-1 text-xs rounded-full font-medium ${statusStyles[status]}`}>
-          {statusLabels[status]}
+    <div className="border border-slate-700 bg-card rounded-xl p-4 shadow-sm flex flex-col justify-between gap-4">
+      <div className="flex items-center justify-between">
+        <span className="font-mono text-xs text-slate-400">Invoice #{id.slice(0, 8)}</span>
+        <span
+          data-testid="capacity-status"
+          className={`px-2 py-0.5 rounded-full text-xs font-medium uppercase ${statusStyles[status]}`}
+        >
+          {status}
         </span>
       </div>
-      <div className="text-sm text-gray-600">
-        <div>Face Value: {faceValue.toString()}</div>
-        <div>Required: {requiredAmount.toString()}</div>
+      <div className="space-y-1">
+        <p className="text-sm text-slate-300">Face Value: <strong className="text-slate-100 font-mono">{faceValue.toString()}</strong></p>
+        <p className="text-xs text-slate-400">Required: <strong className="text-slate-200 font-mono">{requiredAmount.toString()}</strong></p>
       </div>
       {onFund && (
         <button
           onClick={handleFund}
-          disabled={status === "unavailable" || isFunding}
-          className="mt-2 bg-blue-600 text-white py-1.5 px-3 rounded text-sm disabled:opacity-50"
+          disabled={isFunding || status === "unavailable"}
+          className="w-full py-2 bg-teal-600 text-white rounded-lg text-sm font-medium hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           {isFunding ? "Funding..." : "Fund Invoice"}
         </button>
