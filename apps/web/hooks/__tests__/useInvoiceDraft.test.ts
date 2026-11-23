@@ -1,10 +1,11 @@
 import { renderHook, act } from '@testing-library/react';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { useInvoiceDraft } from '../useInvoiceDraft';
 
 describe('useInvoiceDraft', () => {
   beforeEach(() => {
     localStorage.clear();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should detect no draft initially when wallet is not connected', () => {

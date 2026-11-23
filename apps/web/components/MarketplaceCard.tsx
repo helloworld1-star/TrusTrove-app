@@ -27,13 +27,19 @@ export function MarketplaceCard({
   const status = getFundingCapacityStatus(requiredAmount, poolStats);
 
   const statusStyles = {
-    fundable: "bg-green-100 text-green-800",
-    "capacity-limited": "bg-amber-100 text-amber-800",
-    unavailable: "bg-red-100 text-red-800",
+    fundable: "bg-green-500/20 text-green-400 border-green-500/30",
+    "capacity-limited": "bg-amber-500/20 text-amber-400 border-amber-500/30",
+    unavailable: "bg-red-500/20 text-red-400 border-red-500/30",
   };
 
-  const handleFund = async () => {
-    if (!onFund) return;
+  const statusLabels = {
+    fundable: "Fundable",
+    "capacity-limited": "Capacity Limited",
+    unavailable: "Unavailable",
+  };
+
+  const handleFundClick = async () => {
+    if (!onFund || status === "unavailable") return;
     try {
       setIsFunding(true);
       await onFund(id);
@@ -46,29 +52,34 @@ export function MarketplaceCard({
   };
 
   return (
-    <div className="border border-slate-700 bg-card rounded-xl p-4 shadow-sm flex flex-col justify-between gap-4">
-      <div className="flex items-center justify-between">
-        <span className="font-mono text-xs text-slate-400">Invoice #{id.slice(0, 8)}</span>
-        <span
-          data-testid="capacity-status"
-          className={`px-2 py-0.5 rounded-full text-xs font-medium uppercase ${statusStyles[status]}`}
-        >
-          {status}
-        </span>
+    <div className="bg-card border border-border rounded-xl p-4 flex flex-col justify-between shadow-sm" data-testid={`marketplace-card-${id}`}>
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <span className="text-xs font-mono text-muted-foreground">#{id.slice(0, 8)}</span>
+          <span
+            className={`px-2 py-0.5 text-[10px] font-mono rounded-full border ${statusStyles[status]}`}
+            data-testid="funding-capacity-badge"
+          >
+            {statusLabels[status]}
+          </span>
+        </div>
+        <div>
+          <span className="text-[10px] text-muted-foreground font-bold uppercase block">Required Funding</span>
+          <span className="text-base font-bold font-mono text-foreground">
+            {Number(requiredAmount) / 1_000_000} USDC
+          </span>
+        </div>
       </div>
-      <div className="space-y-1">
-        <p className="text-sm text-slate-300">Face Value: <strong className="text-slate-100 font-mono">{faceValue.toString()}</strong></p>
-        <p className="text-xs text-slate-400">Required: <strong className="text-slate-200 font-mono">{requiredAmount.toString()}</strong></p>
-      </div>
-      {onFund && (
+      <div className="mt-4 pt-3 border-t border-border/40">
         <button
-          onClick={handleFund}
-          disabled={isFunding || status === "unavailable"}
-          className="w-full py-2 bg-teal-600 text-white rounded-lg text-sm font-medium hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          type="button"
+          disabled={status === "unavailable" || isFunding}
+          onClick={handleFundClick}
+          className="w-full py-2 bg-primary text-primary-foreground text-xs font-mono rounded hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
-          {isFunding ? "Funding..." : "Fund Invoice"}
+          {isFunding ? "Funding..." : status === "unavailable" ? "Cannot Fund" : "Fund Invoice"}
         </button>
-      )}
+      </div>
     </div>
   );
 }
